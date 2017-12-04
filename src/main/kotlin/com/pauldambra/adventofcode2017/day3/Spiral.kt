@@ -115,4 +115,12 @@ class Spiral(private val maximumAddress: Int) {
     private fun memoryAddressToString(it: Int) =
         it.toString().padStart(maximumAddress.toString().length, ' ')
 
+    fun stepsToAccessPortFor(dataAtAddress: Int): Int {
+        //find current address
+        //find neighbours
+        //choose lowest? (or all?)
+        //repeat until at 1
+        return 0
+    }
+
 }
