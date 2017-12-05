@@ -1,5 +1,7 @@
 # adventofcode2017
 
+[![Build Status](https://travis-ci.org/pauldambra/adventofcode2017.svg?branch=master)](https://travis-ci.org/pauldambra/adventofcode2017)
+
 [see the website for daily puzzles](http://adventofcode.com/2017)
 
 my code solutions are licensed cc by sa. 
