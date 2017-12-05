@@ -32,7 +32,6 @@ class SummingSpiral(targetAddress: Int) : Spiral() {
     private fun startAtOne() {
         rows[0]?.put(0, 1)
         dataAddressCoordinates.put(1, Pair(0, 0))
-        println("Started with address value 1 at x:0, y:0")
     }
 
     private fun step(direction: Direction, currentX: Int, currentY: Int): Pair<Int, Int> {
@@ -61,7 +60,6 @@ class SummingSpiral(targetAddress: Int) : Spiral() {
 
         dataAddressCoordinates.put(sumOfNeighbours, nextSquare)
         rows[nextSquare.second]!!.put(nextSquare.first, sumOfNeighbours)
-        println("Stepped $direction to add address value $sumOfNeighbours at x:${nextSquare.second}, y:${nextSquare.first}")
 
         maximumDataAddress = sumOfNeighbours
         return nextSquare

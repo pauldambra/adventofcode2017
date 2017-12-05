@@ -20,7 +20,6 @@ class CountingSpiral(maximumAddress: Int) : Spiral() {
             val newCoordinate = step(direction, x, y, n)
             x = newCoordinate.first
             y = newCoordinate.second
-            println("Stepped $direction to address $n at x:$x, y:$y")
 
             val coordinateToLeft = coordinateToLeftFor(direction, x, y)
             if (!squareToLeftHasData(coordinateToLeft, rows)) {
@@ -70,11 +69,7 @@ class CountingSpiral(maximumAddress: Int) : Spiral() {
 
         if (dataAtAddress == 1) return 0
 
-        val startingCoordinates = dataAddressCoordinates[dataAtAddress]
-        println("starting for address $dataAtAddress at $startingCoordinates")
-
         val paths = walkPath(dataAtAddress)
-        println("found candidate paths: $paths")
 
         return paths.map { it.size }.filter { it != 0 }.min()!!
 
