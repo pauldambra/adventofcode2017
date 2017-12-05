@@ -2,7 +2,7 @@ package com.pauldambra.adventofcode2017.day3
 
 import kotlin.collections.HashMap
 
-class Spiral(private val maximumAddress: Int) {
+class Spiral(maximumAddress: Int) {
     private val rows : HashMap<Int, HashMap<Int, Int>> = HashMap()
     private val dataAddressCoordinates : HashMap<Int, Pair<Int, Int>> = HashMap()
 
