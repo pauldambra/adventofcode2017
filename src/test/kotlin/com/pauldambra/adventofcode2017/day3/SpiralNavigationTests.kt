@@ -8,7 +8,7 @@ import org.jetbrains.spek.api.dsl.it
 
 object SpiralNavigationTests : Spek({
     describe("can navigate around a spiral") {
-        it("Data from square 1 is carried 0 steps, since it's at the access port.") {
+        it("Data from square 1 is carried 0 cycles, since it's at the access port.") {
             val spiral = CountingSpiral(23)
             val dataAtAddress = 1
             expect(spiral.stepsToAccessPortFor(dataAtAddress)).to.equal(0)
@@ -26,7 +26,7 @@ object SpiralNavigationTests : Spek({
             12 -> 11 -> 2 -> 1
 
         **/
-        it("Data from square 12 is carried 3 steps, such as: down, left, left.") {
+        it("Data from square 12 is carried 3 cycles, such as: down, left, left.") {
             val spiral = CountingSpiral(23)
             val dataAtAddress = 12
             expect(spiral.stepsToAccessPortFor(dataAtAddress)).to.equal(3)
@@ -36,14 +36,14 @@ object SpiralNavigationTests : Spek({
             val spiral = CountingSpiral(3120)
             val dataAtAddress = 3120
             val steps = spiral.stepsToAccessPortFor(dataAtAddress)
-            println("the quickest path back from 3120 has $steps steps")
+            println("the quickest path back from 3120 has $steps cycles")
         }
 
         it("can navigate back from 312051") {
             val spiral = CountingSpiral(312051)
             val dataAtAddress = 312051
             val steps = spiral.stepsToAccessPortFor(dataAtAddress)
-            println("the quickest path back from 312051 has $steps steps")
+            println("the quickest path back from 312051 has $steps cycles")
         }
     }
 })
