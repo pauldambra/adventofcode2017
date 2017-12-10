@@ -87,7 +87,6 @@ class CountingSpiral(maximumAddress: Int) : Spiral() {
         if (dataAtAddress == 1) {
             if (path.size < shortestPathSoFar) {
                 shortestPathSoFar = path.size
-                println("new shortest path has $shortestPathSoFar steps")
             }
             return listOf(path)
         }
