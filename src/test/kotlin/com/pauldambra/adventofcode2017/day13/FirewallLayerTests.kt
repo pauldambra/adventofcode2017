@@ -5,16 +5,16 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.it
 
 object FirewallLayerTests : Spek({
-    it("can create a layer") {
+    it("can create a firewall layer") {
         expect(Layer("0: 3")).to.equal(Layer(0, 3))
     }
-    it("can create two consecutive layers") {
+    it("can create two consecutive layers from a description of the firewall") {
         val layers: List<FirewallLayer> = Layer.parse(
                 "0: 3\n" +
                 "1: 2")
         expect(layers).to.equal(listOf(Layer(0, 3), Layer(1, 2)))
     }
-    it("can create non-consecutive layers") {
+    it("fills in empty layers when description has gaps in the layers") {
         val layers: List<FirewallLayer> = Layer.parse(
                 "0: 4\n" +
                 "3: 3")
