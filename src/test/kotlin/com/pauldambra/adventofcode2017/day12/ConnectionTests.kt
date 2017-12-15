@@ -51,10 +51,48 @@ object ProgramGroupTests : Spek({
                 "1 <-> 2")
         expect(pipes.programsInGroupWith(0)).to.equal(4)
     }
+    it("can count 6 programs in the group in the example input") {
+        val pipes = Pipes.from("0 <-> 2\n" +
+                "1 <-> 1\n" +
+                "2 <-> 0, 3, 4\n" +
+                "3 <-> 2, 4\n" +
+                "4 <-> 2, 3, 6\n" +
+                "5 <-> 6\n" +
+                "6 <-> 4, 5")
+        println("there are ${pipes.programsInGroupWith(0)} programs in a group with program 0")
+    }
+    it("can count programs in the group of 0 in the puzzle input") {
+        val connections = this::class.java
+                .getResource("/day12.txt")
+                .readText()
+        val pipes = Pipes.from(connections)
+        println("Day 12: there are ${pipes.programsInGroupWith(0)} programs in a group with 0")
+    }
+
+    it("can find all groups") {
+        val pipes = Pipes.from("0 <-> 2\n" +
+                "1 <-> 1\n" +
+                "2 <-> 0, 3, 4\n" +
+                "3 <-> 2, 4\n" +
+                "4 <-> 2, 3, 6\n" +
+                "5 <-> 6\n" +
+                "6 <-> 4, 5")
+        val groups = pipes.countAllGroups()
+        println("found $groups as the groups in the input")
+        expect(groups.count()).to.equal(2)
+    }
+    it("can count the groups in the puzzle input") {
+        val connections = this::class.java
+                .getResource("/day12.txt")
+                .readText()
+        val pipes = Pipes.from(connections)
+        val groups = pipes.countAllGroups()
+        println("Day 12: there are ${groups.count()} groups in the input")
+    }
 })
 
 
-class Pipes(val connections: MutableMap<Int, List<Int>>) {
+class Pipes(private val connections: MutableMap<Int, List<Int>>) {
 
     companion object {
         fun from(description: String) : Pipes {
@@ -79,8 +117,31 @@ class Pipes(val connections: MutableMap<Int, List<Int>>) {
         return connections[program] ?: emptyList()
     }
 
-    fun programsInGroupWith(program: Int): Int {
-        return connectionsFrom(program).count() + 1
+    fun programsInGroupWith(program: Int): Int = (countChildrenFrom(program)).distinct().count()
+
+
+    private val visitedChildren = mutableListOf<Int>()
+    private fun countChildrenFrom(program: Int): List<Int> {
+        if (visitedChildren.contains(program)) {
+            //println("not walking children of $program again")
+            return listOf(program)
+        }
+        visitedChildren.add(program)
+        val descendants = connectionsFrom(program).map { countChildrenFrom(it) }.flatten()
+        return listOf(program) + descendants
+    }
+
+    fun countAllGroups(): MutableList<Int> {
+        var unvisitedProgram: Int?
+        var unvisitedPrograms = mutableListOf<Int>()
+        do {
+            unvisitedProgram = connections.keys.find { !visitedChildren.distinct().contains(it) }
+            if (unvisitedProgram != null) {
+                unvisitedPrograms.add(unvisitedProgram)
+                countChildrenFrom(unvisitedProgram)
+            }
+        } while(unvisitedProgram != null)
+        return unvisitedPrograms
     }
 
 
