@@ -79,7 +79,7 @@ object ProgramGroupTests : Spek({
                 "6 <-> 4, 5")
         val groups = pipes.countAllGroups()
         println("found $groups as the groups in the input")
-        expect(groups.count()).to.equal(2)
+        expect(groups).to.equal(2)
     }
     it("can count the groups in the puzzle input") {
         val connections = this::class.java
@@ -87,7 +87,7 @@ object ProgramGroupTests : Spek({
                 .readText()
         val pipes = Pipes.from(connections)
         val groups = pipes.countAllGroups()
-        println("Day 12: there are ${groups.count()} groups in the input")
+        println("Day 12: there are $groups groups in the input")
     }
 })
 
@@ -120,10 +120,10 @@ class Pipes(private val connections: MutableMap<Int, List<Int>>) {
     fun programsInGroupWith(program: Int): Int = (countChildrenFrom(program)).distinct().count()
 
 
-    private val visitedChildren = mutableListOf<Int>()
+    private val visitedChildren = mutableSetOf<Int>()
     private fun countChildrenFrom(program: Int): List<Int> {
         if (visitedChildren.contains(program)) {
-            //println("not walking children of $program again")
+//            println("not walking children of $program again")
             return listOf(program)
         }
         visitedChildren.add(program)
@@ -131,13 +131,14 @@ class Pipes(private val connections: MutableMap<Int, List<Int>>) {
         return listOf(program) + descendants
     }
 
-    fun countAllGroups(): MutableList<Int> {
+    fun countAllGroups(): Int {
         var unvisitedProgram: Int?
-        var unvisitedPrograms = mutableListOf<Int>()
+        var unvisitedPrograms= 0
         do {
-            unvisitedProgram = connections.keys.find { !visitedChildren.distinct().contains(it) }
+            unvisitedProgram = connections.keys.find { !visitedChildren.contains(it) }
+//            println("checking $unvisitedProgram")
             if (unvisitedProgram != null) {
-                unvisitedPrograms.add(unvisitedProgram)
+                unvisitedPrograms += 1
                 countChildrenFrom(unvisitedProgram)
             }
         } while(unvisitedProgram != null)
