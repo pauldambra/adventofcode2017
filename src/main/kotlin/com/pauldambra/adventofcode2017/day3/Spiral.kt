@@ -1,5 +1,7 @@
 package com.pauldambra.adventofcode2017.day3
 
+import com.pauldambra.adventofcode2017.Direction
+
 
 open class Spiral {
     protected fun coordinateToLeftFor(direction: Direction, x: Int, y: Int)

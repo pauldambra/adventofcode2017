@@ -1,5 +1,6 @@
 package com.pauldambra.adventofcode2017.day3
 
+import com.pauldambra.adventofcode2017.Direction
 import kotlin.collections.HashMap
 
 class CountingSpiral(maximumAddress: Int) : Spiral() {

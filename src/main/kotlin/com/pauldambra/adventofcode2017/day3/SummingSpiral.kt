@@ -1,5 +1,7 @@
 package com.pauldambra.adventofcode2017.day3
 
+import com.pauldambra.adventofcode2017.Direction
+
 class SummingSpiral(targetAddress: Int) : Spiral() {
     var maximumDataAddress: Int = 0
     private val rows : HashMap<Int, HashMap<Int, Int>> = HashMap()
