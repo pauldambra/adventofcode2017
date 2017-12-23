@@ -10,18 +10,18 @@ import kotlin.math.absoluteValue
 object ParticleTests : Spek({
     it("can parse particles") {
         val input = "p=<2411,-29,-1776>, v=<345,-4,-258>, a=<-25,0,22>"
-        val p: Particle = Particle.parse(input)
+        val p: Particle = Particle.parse(IndexedValue(0, input))
 
         val position = GpuCoordinate(2411, -29, -1776)
         val velocity = GpuCoordinate(345, -4, -258)
         val acceleration = GpuCoordinate(-25, 0, 22)
-        expect(p).to.equal(Particle(position, velocity, acceleration))
+        expect(p).to.equal(Particle(0, position, velocity, acceleration))
     }
     it("sums the position to get the particles manhattan distance") {
         val position = GpuCoordinate(1, 2, 3)
         val velocity = GpuCoordinate(2, 9, 3)
         val acceleration = GpuCoordinate(2, 2, -2)
-        val p = Particle(position, velocity, acceleration)
+        val p = Particle(0, position, velocity, acceleration)
 
         expect(p.manhattanDistance()).to.equal(6)
     }
@@ -30,7 +30,7 @@ object ParticleTests : Spek({
             val position = GpuCoordinate(0, 0, 0)
             val velocity = GpuCoordinate(2, 0, 0)
             val acceleration = GpuCoordinate(2, 0, 0)
-            val p = Particle(position, velocity, acceleration)
+            val p = Particle(0, position, velocity, acceleration)
 
             p.tick()
 
@@ -40,7 +40,7 @@ object ParticleTests : Spek({
             val position = GpuCoordinate(0, 0, 0)
             val velocity = GpuCoordinate(2, 9, 0)
             val acceleration = GpuCoordinate(2, 2, 0)
-            val p = Particle(position, velocity, acceleration)
+            val p = Particle(0, position, velocity, acceleration)
 
             p.tick()
 
@@ -52,7 +52,7 @@ object ParticleTests : Spek({
             val position = GpuCoordinate(0, 0, 0)
             val velocity = GpuCoordinate(2, 9, 3)
             val acceleration = GpuCoordinate(2, 2, -2)
-            val p = Particle(position, velocity, acceleration)
+            val p = Particle(0, position, velocity, acceleration)
 
             p.tick()
 
@@ -64,7 +64,7 @@ object ParticleTests : Spek({
             val position = GpuCoordinate(0, 0, 0)
             val velocity = GpuCoordinate(2, 9, 3)
             val acceleration = GpuCoordinate(2, 2, -2)
-            val p = Particle(position, velocity, acceleration)
+            val p = Particle(0, position, velocity, acceleration)
 
             p.tick()
 
@@ -74,7 +74,7 @@ object ParticleTests : Spek({
             val position = GpuCoordinate(0, 0, 0)
             val velocity = GpuCoordinate(2, 9, 3)
             val acceleration = GpuCoordinate(2, 2, -2)
-            val p = Particle(position, velocity, acceleration)
+            val p = Particle(0, position, velocity, acceleration)
 
             p.tick()
 
@@ -85,7 +85,7 @@ object ParticleTests : Spek({
             val position = GpuCoordinate(0, 0, 0)
             val velocity = GpuCoordinate(2, 9, 3)
             val acceleration = GpuCoordinate(2, 2, -2)
-            val p = Particle(position, velocity, acceleration)
+            val p = Particle(0, position, velocity, acceleration)
 
             p.tick()
 
@@ -152,7 +152,7 @@ object GpuBufferTests : Spek({
             buffer.closestParticle()
         }
 
-        buffer.printPositions()
+//        buffer.printPositions()
         val closestParticle = buffer.closestParticle()
         expect(closestParticle).to.be.below(518)
         expect(closestParticle).to.be.above(366)
@@ -160,18 +160,51 @@ object GpuBufferTests : Spek({
         println("day 20 part 1: particle that stays closest to 0 is $closestParticle")
 
     }
+
+    it("can find out how many particles are removed in collisions") {
+        val description = this::class.java
+                .getResource("/day20.txt")
+                .readText()
+
+        val buffer = GpuBuffer.parse(description)
+
+        repeat(1000) {
+            buffer.tick(true)
+            buffer.closestParticle()
+        }
+
+        val remainingParticles = buffer.particles.count()
+        println("day 20 part 2: particles left after all collisions are resolved = $remainingParticles")
+    }
 })
 
-class GpuBuffer(var particles: List<Particle>) {
+class GpuBuffer(var particles: MutableList<Particle>) {
     companion object {
         fun parse(particleDescriptions: String) =
-                GpuBuffer(particleDescriptions.split("\n").map(Particle.Companion::parse))
+                GpuBuffer(particleDescriptions.split("\n").withIndex().map(Particle.Companion::parse).toMutableList())
     }
 
-    fun closestParticle() = particles.withIndex().minBy { it.value.manhattanDistance() }!!.index
+    fun closestParticle() = particles.minBy { it.manhattanDistance() }!!.index
 
-    fun tick() {
+    fun tick(removeCollidingParticles:Boolean = false) {
         particles.forEach { it.tick() }
+
+        if (removeCollidingParticles) {
+            val gatherParticles = mutableMapOf<GpuCoordinate, MutableList<Particle>>()
+            particles.forEach {
+                if(!gatherParticles.containsKey(it.position)) {
+                    gatherParticles.put(it.position, mutableListOf())
+                }
+                gatherParticles[it.position]!!.add(it)
+            }
+
+            gatherParticles
+                    .filter { it.value.count() > 1 }
+                    .values
+                    .flatten()
+                    .forEach { particles.remove(it) }
+        }
+
     }
 
     fun printPositions() {
@@ -206,16 +239,16 @@ data class GpuCoordinate(var x: Long, var y: Long, var z: Long) {
     }
 }
 
-data class Particle(val position: GpuCoordinate, val velocity: GpuCoordinate, private val acceleration: GpuCoordinate) {
+data class Particle(val index: Int, val position: GpuCoordinate, val velocity: GpuCoordinate, private val acceleration: GpuCoordinate) {
     companion object {
-        fun parse(description: String): Particle {
+        fun parse(description: IndexedValue<String>): Particle {
             val regex = Regex("(-?\\d+,-?\\d+,-?\\d+)")
-            val s = regex.findAll(description).toList().map { it.groups.first()?.value }.map { it?.split(",") }
+            val s = regex.findAll(description.value).toList().map { it.groups.first()?.value }.map { it?.split(",") }
             val position = GpuCoordinate.parse(s[0]!!)
             val velocity = GpuCoordinate.parse(s[1]!!)
             val acceleration = GpuCoordinate.parse(s[2]!!)
 
-            return Particle(position, velocity, acceleration)
+            return Particle(description.index, position, velocity, acceleration)
         }
     }
 
