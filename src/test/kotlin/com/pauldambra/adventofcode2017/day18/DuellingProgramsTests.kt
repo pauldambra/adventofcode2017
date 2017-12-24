@@ -65,14 +65,14 @@ object DuellingProgramsTests : Spek({
             expect(p.prorgramOne.sendCount).to.equal(3)
         }
 
-        it("can process puzzle input") {
-            val p = DuellingPrograms()
-
-            p.execute(puzzleInput)
-
-            val sentMessages = p.prorgramOne.sendCount
-            println("day 18 part 2: program one sent $sentMessages messages")
-        }
+//        it("can process puzzle input") {
+//            val p = DuellingPrograms()
+//
+//            p.execute(puzzleInput)
+//
+//            val sentMessages = p.prorgramOne.sendCount
+//            println("day 18 part 2: program one sent $sentMessages messages")
+//        }
     }
 
     context("set") {
