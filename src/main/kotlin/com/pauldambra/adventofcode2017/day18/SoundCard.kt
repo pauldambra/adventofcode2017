@@ -25,7 +25,7 @@ class SoundCard {
                     val gate = readValueFromInstruction(instructionParts[1])
                     if (gate > 0) {
                         val jumpAmount = readValueFromInstruction(instructionParts[2])
-                        println("jumping by $jumpAmount")
+//                        println("jumping by $jumpAmount")
                         nextIndex += jumpAmount.toInt()
                         continue@loop
 
@@ -34,7 +34,7 @@ class SoundCard {
                 instructionParts[0] == "set" -> {
                     val register = instructionParts[1].toCharArray().single()
                     val x = readValueFromInstruction(instructionParts[2])
-                    println("setting $register to $x")
+//                    println("setting $register to $x")
                     registers[register] = x
                 }
                 instructionParts[0] == "snd" -> playing = readValueFromInstruction(instructionParts[1])
@@ -58,7 +58,7 @@ class SoundCard {
         val current = registers[register]!!
         val x = readValueFromInstruction(instructionParts[2])
         val result = op(current, x)
-        println("$current ${instructionParts[0]} x = $result for register $register")
+//        println("$current ${instructionParts[0]} x = $result for register $register")
         registers[register] = result
     }
 
