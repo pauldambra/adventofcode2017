@@ -103,11 +103,24 @@ object CoprocessorTests : Spek({
         c.execute(puzzleInput)
         println("day 23 part 1: mul count is ${c.mulCount()}")
     }
+
+    it("can start with register a set to 1") {
+        val c = Coprocessor(1L)
+        expect(c.registers()['a']).to.equal(1)
+    }
+
+    it("can solve for h in the puzzle input") {
+        val c = Coprocessor(1)
+        c.execute(puzzleInput)
+        println("day 23 part 2: h is ${c.registers()['h']}")
+    }
 })
 
-class Coprocessor {
+class Coprocessor(registerA: Long = 0) {
     private val registers = ('a'..'h').map { Pair(it, 0L) }.toMap().toMutableMap()
-
+    init {
+        registers['a'] = registerA
+    }
     private var mulCount = 0
     fun mulCount() = mulCount
 
