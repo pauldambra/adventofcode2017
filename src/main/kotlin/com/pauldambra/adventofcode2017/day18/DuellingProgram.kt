@@ -2,7 +2,7 @@ package com.pauldambra.adventofcode2017.day18
 
 import java.util.*
 
-class DuellingProgram(programId: Long) {
+class DuellingProgram(val programId: Long) {
     private val registers = mutableMapOf<Char, Long>()
 
     var sendCount = 0
@@ -28,13 +28,13 @@ class DuellingProgram(programId: Long) {
             instructionParts[0] == "snd" -> {
                 val sendValue = readValueFromInstruction(instructionParts[1])
                 sendCount++
-//                println("have now sent $sendCount messages from program: $programId")
+                println("have now sent $sendCount messages from program: $programId")
                 outboundQueue.addLast(sendValue)
             }
             instructionParts[0] == "rcv" -> {
                 val nextValue = if (inboundQueue.isNotEmpty()) inboundQueue.pop() else null
                 if (nextValue == null) {
-//                    println("program: $programId waiting for next value on queue!")
+                    println("program: $programId waiting for next value on queue!")
                     isWaiting = true
                 } else {
                     registers[instructionParts[1].toCharArray().first()] = nextValue
@@ -44,14 +44,14 @@ class DuellingProgram(programId: Long) {
                 val gate = readValueFromInstruction(instructionParts[1])
                 if (gate > 0) {
                     val jumpAmount = readValueFromInstruction(instructionParts[2])
-////                    println("jumping by $jumpAmount")
+//                    println("jumping by $jumpAmount")
                     nextIndex = jumpAmount.toInt() + index
                 }
             }
             instructionParts[0] == "set" -> {
                 val register = instructionParts[1].toCharArray().single()
                 val x = readValueFromInstruction(instructionParts[2])
-////                println("setting $register to $x")
+//                println("setting $register to $x")
                 registers[register] = x
             }
             instructionParts[0] == "mul" -> applyOperatorTo(instructionParts, Long::times)
@@ -69,7 +69,7 @@ class DuellingProgram(programId: Long) {
         val current = registers[register]!!
         val x = readValueFromInstruction(instructionParts[2])
         val result = op(current, x)
-////        println("$current ${instructionParts[0]} x = $result for register $register")
+//        println("$current ${instructionParts[0]} x = $result for register $register")
         registers[register] = result
     }
 
@@ -88,12 +88,12 @@ class DuellingProgram(programId: Long) {
 
 class DuellingPrograms {
 
-    private val programZero = DuellingProgram(0)
-    val programOne = DuellingProgram(1)
+    val programZero = DuellingProgram(0)
+    val prorgramOne = DuellingProgram(1)
 
     init {
-        programZero.setInboundQueue(programOne.outboundQueue)
-        programOne.setInboundQueue(programZero.outboundQueue)
+        programZero.setInboundQueue(prorgramOne.outboundQueue)
+        prorgramOne.setInboundQueue(programZero.outboundQueue)
     }
 
     fun execute(instruction: String) {
@@ -110,14 +110,14 @@ class DuellingPrograms {
             programZeroIndex = i
             isWaiting0 = w
 
-            val (i1, w1) = programOne.execute(instructions[programOneIndex], programOneIndex)
+            val (i1, w1) = prorgramOne.execute(instructions[programOneIndex], programOneIndex)
             programOneIndex = i1
             isWaiting1 = w1
 
-//            println("end of run")
-//            println("prog zero: $programZeroIndex and waiting? $isWaiting0")
-//            println("prog one: $programOneIndex and waiting? $isWaiting1")
-//            println("-----------")
+            println("end of run")
+            println("prog zero: $programZeroIndex and waiting? $isWaiting0")
+            println("prog one: $programOneIndex and waiting? $isWaiting1")
+            println("-----------")
 
 
         }

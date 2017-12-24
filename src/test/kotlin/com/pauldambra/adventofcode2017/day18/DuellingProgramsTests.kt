@@ -4,6 +4,7 @@ import com.winterbe.expekt.expect
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.context
 import org.jetbrains.spek.api.dsl.it
+import java.util.*
 import kotlin.math.nextUp
 
 
@@ -61,18 +62,17 @@ object DuellingProgramsTests : Spek({
 
             p.execute(exampleInput)
 
-            expect(p.programOne.sendCount).to.equal(3)
+            expect(p.prorgramOne.sendCount).to.equal(3)
         }
 
-//        it("can process puzzle input") {
-        //too slow for travis
-//            val p = DuellingPrograms()
-//
-//            p.execute(puzzleInput)
-//
-//            val sentMessages = p.programOne.sendCount
-//            println("day 18 part 2: program one sent $sentMessages messages")
-//        }
+        it("can process puzzle input") {
+            val p = DuellingPrograms()
+
+            p.execute(puzzleInput)
+
+            val sentMessages = p.prorgramOne.sendCount
+            println("day 18 part 2: program one sent $sentMessages messages")
+        }
     }
 
     context("set") {
