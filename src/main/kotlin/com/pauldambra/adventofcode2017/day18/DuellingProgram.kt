@@ -54,7 +54,6 @@ class DuellingProgram(val programId: Long) {
 //                println("setting $register to $x")
                 registers[register] = x
             }
-            instructionParts[0] == "add" -> applyOperatorTo(instructionParts, Long::plus)
             instructionParts[0] == "mul" -> applyOperatorTo(instructionParts, Long::times)
             instructionParts[0] == "mod" -> applyOperatorTo(instructionParts, Long::rem)
         }
