@@ -261,6 +261,7 @@ object DepthFirstBridges : Spek(
           b.build()
 
           println("day 24 part 1: strongest bridge is ${b.strongestBridge}")
+          println("day 24 part 2: strength of the longest bridge is ${b.longestBridge}")
       }
 
       it("can not re-use parents in a chain") {
@@ -334,10 +335,25 @@ class BridgeBuilder(private val components: List<Component>) {
                 } else {
 //                    println("no connecting components available")
                     if (current.strength > strongestBridge) strongestBridge = current.strength
-                    println("terminating a branch with strongest bridge set as $strongestBridge")
+                    updateLongestBridge(current)
+//                    println("terminating a branch with strongest bridge set as $strongestBridge")
                 }
             }
 //            println("-----------")
+        }
+    }
+
+    private fun updateLongestBridge(current: Node) {
+        if (current.depth < longestBridge.depth) return
+
+        if (current.depth == longestBridge.depth) {
+            if (current.strength > longestBridge.strength) {
+                longestBridge = current
+            }
+        }
+
+        if (current.depth > longestBridge.depth) {
+            longestBridge = current
         }
     }
 
@@ -345,6 +361,9 @@ class BridgeBuilder(private val components: List<Component>) {
       c.openPort()!!.pins != 0
 
     var strongestBridge: Int = 0
+        private set
+
+    var longestBridge: Node = Node(0, -1, Component(-1, -1))
         private set
 
 }
