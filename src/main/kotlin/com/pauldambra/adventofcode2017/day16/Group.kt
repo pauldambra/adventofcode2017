@@ -5,7 +5,7 @@ data class Group(var state: MutableList<Char>) {
 
     fun dance(moves: String, repeats: Int) {
 //        var startTime = System.currentTimeMillis()
-        (1..repeats).forEach { n ->
+        (1..repeats).forEach { _ ->
 
 //            if (n % 1_000_000 == 0) {
 //                val elapsed = System.currentTimeMillis() - startTime

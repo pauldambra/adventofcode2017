@@ -74,8 +74,8 @@ class Program(internal val name: String, private val weight: Int, internal val c
         } else {
             val balancedNodesValue = sums.entries.groupBy { it.value }.filter { it.value.size != 1 }.keys.first()
             val unbalancedNode = sums.entries.groupBy { it.value }.filter { it.value.size == 1 }.values.first().first()
-            val balancingNecessary = (balancedNodesValue - unbalancedNode.value).absoluteValue
-            seekUnbalancedNode(program.children[unbalancedNode.key]!!, balancingNecessary, unbalancedNodes + unbalancedNode.key)
+            val newBalancingNecessary = (balancedNodesValue - unbalancedNode.value).absoluteValue
+            seekUnbalancedNode(program.children[unbalancedNode.key]!!, newBalancingNecessary, unbalancedNodes + unbalancedNode.key)
         }
     }
 
