@@ -63,7 +63,7 @@ object PixelArtTests : Spek(
               expect(final.pixelsOn()).to.equal(12)
           }
 
-          it("can generate art for the puzzle input") {
+          it("can generate art for the puzzle input for five iterations") {
               val rules = this::class.java
                 .getResource("/day21.txt")
                 .readText()
@@ -75,6 +75,20 @@ object PixelArtTests : Spek(
               val final = startingGrid.generateArt(rules, 5)
               expect(final.pixelsOn()).not.to.equal(10)
               println("day 21 part 1: there are ${final.pixelsOn()} pixels on after 5 iterations")
+          }
+
+          it("can generate art for the puzzle input for 18 iterations") {
+              val rules = this::class.java
+                .getResource("/day21.txt")
+                .readText()
+                .split("\n")
+                .map { it.split(" => ") }
+                .map { Pair(it[0], it[1]) }
+                .toMap()
+
+              val final = startingGrid.generateArt(rules, 18)
+              expect(final.pixelsOn()).to.be.below(2389006)
+              println("day 21 part 2: there are ${final.pixelsOn()} pixels on after 18 iterations")
           }
       }
 
@@ -175,16 +189,14 @@ private fun String.pixelsOn() = this.count { it == '#' }
 private fun String.generateArt(rules: Map<String, String>, iterations: Int): String {
     var next = this.convertToLine()
     repeat(iterations) {
+
         val splat = next.splitGrid()
-//        println("splats to $splat")
 
         val enhancedSquares = splat.map { it.replaceFrom(rules) }.toList()
 
         next = combineEnhancedSquares(enhancedSquares)
 
-//        println("after replacement we have $next")
     }
-
 
     return next
 }
@@ -213,11 +225,7 @@ private fun String.splitGrid(): List<String> {
 
     if (rows.count() == 2 || rows.count() == 3) return listOf(this.convertToLine())
 
-//    println("rows $rows")
-
     val gridSize = gridSize(rows)
-
-//    println("gridsize: $gridSize")
 
     val x = mutableListOf<String>()
     for (i in 0 until rows.count() step gridSize) {
@@ -273,11 +281,12 @@ private fun String.generateRotatedGrids(): List<String> {
 }
 
 private fun String.replaceFrom(patterns: Map<String, String>): String {
-//    println("orig: $this")
+
     val rotatedGrids = this.generateRotatedGrids()
     val matched = rotatedGrids.find { patterns.containsKey(it) }
     return if (matched != null) {
         val match = patterns[matched]!!
+//        println("orig: $this")
 //        println("enhanced: $match")
         match
     } else {
