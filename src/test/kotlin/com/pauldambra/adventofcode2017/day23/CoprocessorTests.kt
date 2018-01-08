@@ -4,123 +4,190 @@ import com.winterbe.expekt.expect
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.it
 
-val puzzleInput = "set b 67\n" +
-        "set c b\n" +
-        "jnz a 2\n" +
-        "jnz 1 5\n" +
-        "mul b 100\n" +
-        "sub b -100000\n" +
-        "set c b\n" +
-        "sub c -17000\n" +
-        "set f 1\n" +
-        "set d 2\n" +
-        "set e 2\n" +
-        "set g d\n" +
-        "mul g e\n" +
-        "sub g b\n" +
-        "jnz g 2\n" +
-        "set f 0\n" +
-        "sub e -1\n" +
-        "set g e\n" +
-        "sub g b\n" +
-        "jnz g -8\n" +
-        "sub d -1\n" +
-        "set g d\n" +
-        "sub g b\n" +
-        "jnz g -13\n" +
-        "jnz f 2\n" +
-        "sub h -1\n" +
-        "set g b\n" +
-        "sub g c\n" +
-        "jnz g 2\n" +
-        "jnz 1 3\n" +
-        "sub b -17\n" +
-        "jnz 1 -23"
+/*
+{ b: 67 }
+{ b: 67, c: 67 }
+{ b: 670, c: 67 }
 
-object CoprocessorTests : Spek({
-    it("can set the value of a register to a number") {
-        val c = Coprocessor()
-        c.execute("set a 12")
-        expect(c.registers()['a']).to.equal(12)
+ */
+
+val puzzleInput =
+  "set b 67\n" +
+    "set c b\n" +
+    "jnz a 2\n" +
+    "jnz 1 5\n" +
+    "mul b 100\n" +
+    "sub b -100000\n" +
+    "set c b\n" +
+    "sub c -17000\n" +
+    "set f 1\n" +
+    "set d 2\n" +
+    "set e 2\n" +
+    "set g d\n" +
+    "mul g e\n" +
+    "sub g b\n" +
+    "jnz g 2\n" +
+    "set f 0\n" +
+    "sub e -1\n" +
+    "set g e\n" +
+    "sub g b\n" +
+    "jnz g -8\n" +
+    "sub d -1\n" +
+    "set g d\n" +
+    "sub g b\n" +
+    "jnz g -13\n" +
+    "jnz f 2\n" +
+    "sub h -1\n" +
+    "set g b\n" +
+    "sub g c\n" +
+    "jnz g 2\n" +
+    "jnz 1 3\n" +
+    "sub b -17\n" +
+    "jnz 1 -23"
+
+object CoprocessorTests : Spek(
+  {
+      it("can set the value of a register to a number") {
+          val c = Coprocessor()
+          c.execute("set a 12")
+          expect(c.registers()['a']).to.equal(12)
+      }
+
+      it("can set the value of a register to another register") {
+          val c = Coprocessor()
+          c.execute("set a 12")
+          c.execute("set b a")
+          expect(c.registers()['b']).to.equal(12)
+      }
+
+      it("can subtract by a number") {
+          val c = Coprocessor()
+          c.execute("set a 12")
+          c.execute("sub a 2")
+          expect(c.registers()['a']).to.equal(10)
+      }
+
+      it("can subtract by a register") {
+          val c = Coprocessor()
+          c.execute("set a 12")
+          c.execute("sub b a")
+          expect(c.registers()['b']).to.equal(-12)
+      }
+
+      it("can multiply by a number") {
+          val c = Coprocessor()
+          c.execute("set a 12")
+          c.execute("mul a 2")
+          expect(c.registers()['a']).to.equal(24)
+      }
+
+      it("can multiply by a register") {
+          val c = Coprocessor()
+          c.execute("set a 12\n" +
+                      "set b 3\n" +
+                      "mul b a")
+          expect(c.registers()['b']).to.equal(36)
+      }
+
+      it("can jump when not zero") {
+          val c = Coprocessor()
+          c.execute("set a 12\n" +
+                      "jnz a 2\n" +
+                      "set b 2\n" +
+                      "mul b a")
+          expect(c.registers()['b']).to.equal(0)
+          expect(c.registers()['a']).to.equal(12)
+      }
+
+      it("can count muls") {
+          val c = Coprocessor()
+          c.execute("set a 12\n" +
+                      "set b 3\n" +
+                      "mul b a")
+          expect(c.mulCount()).to.equal(1)
+      }
+
+      it("can count muls in the puzzle input") {
+          val c = Coprocessor()
+          c.execute(puzzleInput)
+          println("day 23 part 1: mul count is ${c.mulCount()}")
+      }
+
+      it("can start with register a set to 1") {
+          val c = Coprocessor(1L)
+          expect(c.registers()['a']).to.equal(1)
+      }
+
+      it("can solve for h in the puzzle input") {
+          val c = OptimizedCoprocessor(1)
+          c.execute()
+          val h = c.h()
+          expect(h).not.to.equal(1001)
+          println("day 23 part 2: h is $h")
+      }
+  })
+
+class OptimizedCoprocessor(registerA: Long = 0) {
+
+    var a: Long = 0L
+    //    var b: Long = 0L
+    var c: Long = 0L
+    //    var d: Long = 0L
+//    var e: Long = 0L
+    var f: Long = 0L
+    var g: Long = 0L
+    var h: Long = 0L
+
+    init {
+        a = registerA
     }
 
-    it("can set the value of a register to another register") {
-        val c = Coprocessor()
-        c.execute("set a 12")
-        c.execute("set b a")
-        expect(c.registers()['b']).to.equal(12)
+    private var mulCount = 0
+    fun mulCount() = mulCount
+
+    fun execute() {
+
+        // almost all of this optimisation is either copied from
+        // or heavily inspired by other people's explanations online
+        // o_O
+        for (b in 106700L until 123701L step 17) {
+            f = 1
+
+            seeker@ for (d in 2 until b + 1) {
+                if (b % d == 0L) {
+                    for (e in 2 until b + 1) {
+                        if (d * e == b) {
+                            f = 0
+                            break@seeker
+                        }
+                    }
+                }
+            }
+
+            if (f == 0L) {
+                h += 1
+            }
+
+            g = b - c
+
+            if (g == 0L) {
+                //then we are finished!
+                return
+            }
+        }
+
     }
 
-    it("can subtract by a number") {
-        val c = Coprocessor()
-        c.execute("set a 12")
-        c.execute("sub a 2")
-        expect(c.registers()['a']).to.equal(10)
-    }
-
-    it("can subtract by a register") {
-        val c = Coprocessor()
-        c.execute("set a 12")
-        c.execute("sub b a")
-        expect(c.registers()['b']).to.equal(-12)
-    }
-
-    it("can multiply by a number") {
-        val c = Coprocessor()
-        c.execute("set a 12")
-        c.execute("mul a 2")
-        expect(c.registers()['a']).to.equal(24)
-    }
-
-    it("can multiply by a register") {
-        val c = Coprocessor()
-        c.execute("set a 12\n"+
-                "set b 3\n"+
-                "mul b a")
-        expect(c.registers()['b']).to.equal(36)
-    }
-
-    it("can jump when not zero") {
-        val c = Coprocessor()
-        c.execute("set a 12\n"+
-                "jnz a 2\n"+
-                "set b 2\n"+
-                "mul b a")
-        expect(c.registers()['b']).to.equal(0)
-        expect(c.registers()['a']).to.equal(12)
-    }
-
-    it("can count muls") {
-        val c = Coprocessor()
-        c.execute("set a 12\n"+
-                "set b 3\n"+
-                "mul b a")
-        expect(c.mulCount()).to.equal(1)
-    }
-
-    it("can count muls in the puzzle input") {
-        val c = Coprocessor()
-        c.execute(puzzleInput)
-        println("day 23 part 1: mul count is ${c.mulCount()}")
-    }
-
-    it("can start with register a set to 1") {
-        val c = Coprocessor(1L)
-        expect(c.registers()['a']).to.equal(1)
-    }
-
-    it("can solve for h in the puzzle input") {
-        val c = Coprocessor(1)
-        c.execute(puzzleInput)
-        println("day 23 part 2: h is ${c.registers()['h']}")
-    }
-})
+    fun h() = h
+}
 
 class Coprocessor(registerA: Long = 0) {
     private val registers = ('a'..'h').map { Pair(it, 0L) }.toMap().toMutableMap()
+
     init {
         registers['a'] = registerA
     }
+
     private var mulCount = 0
     fun mulCount() = mulCount
 
@@ -129,6 +196,7 @@ class Coprocessor(registerA: Long = 0) {
         var nextIndex = 0
 
         controlLoop@ while (0 <= nextIndex && nextIndex < instructions.size) {
+
             val instructionParts = instructions[nextIndex].split(" ")
             when {
                 instructionParts[0] == "set" -> {
